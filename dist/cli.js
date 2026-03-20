@@ -26,7 +26,7 @@ program
 });
 program
     .command('report')
-    .description('Generate a detailed compliance report from last run results')
+    .description('Run all gates and generate a detailed report (always exits 0)')
     .option('--config <path>', 'Path to .agent-gate.yaml (default: .agent-gate.yaml)')
     .option('--json', 'Output as JSON')
     .action((opts) => {

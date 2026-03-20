@@ -1,5 +1,9 @@
 # agent-gate
 
+[![Part of Preflight](https://img.shields.io/badge/suite-Preflight-blue)](https://github.com/StanislavBG/agent-gate)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)]()
+[![License](https://img.shields.io/badge/license-MIT-green)]()
+
 **One command. Three checks. CI-friendly pass/fail.**
 
 Pre-deploy readiness gate for AI agents. Runs regression tests (Stepproof), compliance scan (agent-comply), and cost estimation in parallel — then exits 0 or 1.
@@ -165,7 +169,7 @@ jobs:
 
       - name: Install gates
         run: |
-          npm install -g stepproof agent-comply agent-gate
+          npm install -g github:StanislavBG/stepproof github:StanislavBG/agent-comply github:StanislavBG/agent-gate
 
       - name: Run agent-gate
         run: agent-gate run --json > gate-report.json
@@ -184,7 +188,7 @@ jobs:
 agent-gate:
   image: node:20
   script:
-    - npm install -g stepproof agent-comply agent-gate
+    - npm install -g github:StanislavBG/stepproof github:StanislavBG/agent-comply github:StanislavBG/agent-gate
     - agent-gate run
   artifacts:
     when: always

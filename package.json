@@ -16,6 +16,13 @@
   },
   "keywords": ["ai", "agent", "ci", "compliance", "eu-ai-act", "testing"],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StanislavBG/agent-gate"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@preflight/license": "file:../preflight-license",
     "chalk": "^5.3.0",

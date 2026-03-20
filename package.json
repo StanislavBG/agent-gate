@@ -1,6 +1,6 @@
 {
   "name": "agent-gate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Pre-deploy CI gate for AI agents: regression tests, compliance scan, cost check — unified pass/fail verdict",
   "type": "module",
   "main": "dist/cli.js",

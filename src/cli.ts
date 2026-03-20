@@ -9,7 +9,7 @@ const program = new Command();
 program
   .name('agent-gate')
   .description('Pre-deploy CI gate for AI agents: regression tests + compliance + cost — unified pass/fail')
-  .version('0.1.0');
+  .version('0.2.0');
 
 program
   .command('init')

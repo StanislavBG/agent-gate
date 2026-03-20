@@ -19,7 +19,7 @@ export async function runReport(opts) {
     const cwd = process.cwd();
     try {
         const result = await runAllGates(config, cwd);
-        printReport(result, { json: opts.json });
+        printReport(result, { json: opts.json, format: opts.format });
         // report command: always exit 0
         process.exit(0);
     }

@@ -20,6 +20,7 @@ program
     .description('Run all gates and produce a unified pass/fail verdict')
     .option('--config <path>', 'Path to .agent-gate.yaml (default: .agent-gate.yaml)')
     .option('--json', 'Output result as JSON')
+    .option('--format <format>', 'Output format: sarif or junit')
     .option('--no-fail', 'Exit 0 even on gate failures (report-only mode)')
     .action((opts) => {
     runRun(opts);
@@ -29,6 +30,7 @@ program
     .description('Run all gates and generate a detailed report (always exits 0)')
     .option('--config <path>', 'Path to .agent-gate.yaml (default: .agent-gate.yaml)')
     .option('--json', 'Output as JSON')
+    .option('--format <format>', 'Output format: sarif or junit')
     .action((opts) => {
     runReport(opts);
 });

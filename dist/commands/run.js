@@ -15,7 +15,7 @@ export async function runRun(opts) {
     const cwd = process.cwd();
     try {
         const result = await runAllGates(config, cwd);
-        printReport(result, { json: opts.json });
+        printReport(result, { json: opts.json, format: opts.format });
         exitWithVerdict(result, opts.fail === false);
     }
     catch (err) {

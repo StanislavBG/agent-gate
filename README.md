@@ -198,6 +198,37 @@ agent-gate:
 
 ---
 
+## Structured reports (v0.2.0)
+
+agent-gate outputs machine-readable SARIF 2.1.0 and JUnit XML for CI pipeline integration.
+
+```bash
+# Run all gates and output SARIF
+agent-gate run --format sarif
+agent-gate run --format sarif > gate-results.sarif
+
+# Generate report in JUnit XML
+agent-gate report --format junit
+```
+
+Integrate with GitHub Advanced Security:
+
+```yaml
+# .github/workflows/agent-gate.yml
+- name: Run agent gate
+  run: agent-gate run --format sarif > gate-results.sarif
+
+- name: Upload to GitHub Security tab
+  uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: gate-results.sarif
+  if: always()
+```
+
+Gate failures (regression tests, compliance violations, cost overruns) appear as code scanning alerts. Default output (no `--format` flag) is unchanged — human-readable terminal output.
+
+---
+
 ## Part of the Preflight suite
 
 agent-gate is one tool in a suite of AI agent pre-deploy checks:

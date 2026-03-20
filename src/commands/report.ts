@@ -6,6 +6,7 @@ import chalk from 'chalk';
 interface ReportOpts {
   config?: string;
   json?: boolean;
+  format?: string;
 }
 
 /**
@@ -26,7 +27,7 @@ export async function runReport(opts: ReportOpts): Promise<void> {
 
   try {
     const result = await runAllGates(config, cwd);
-    printReport(result, { json: opts.json });
+    printReport(result, { json: opts.json, format: opts.format });
     // report command: always exit 0
     process.exit(0);
   } catch (err) {

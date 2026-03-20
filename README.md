@@ -5,7 +5,9 @@
 Pre-deploy readiness gate for AI agents. Runs regression tests (Stepproof), compliance scan (agent-comply), and cost estimation in parallel — then exits 0 or 1.
 
 ```bash
-npx agent-gate run
+# Install from GitHub (npm package coming soon)
+npm install -g github:StanislavBG/agent-gate github:StanislavBG/stepproof github:StanislavBG/agent-comply
+agent-gate run
 ```
 
 ---
@@ -21,8 +23,8 @@ Shipping an AI agent to production requires three separate checks: did the behav
 ## 30-second quickstart
 
 ```bash
-# Install
-npm install -g agent-gate
+# Install from GitHub (npm package coming soon)
+npm install -g github:StanislavBG/agent-gate github:StanislavBG/stepproof github:StanislavBG/agent-comply
 
 # Scaffold config
 agent-gate init
@@ -217,3 +219,21 @@ Use Stepproof and agent-comply directly during development. Use agent-gate in CI
 ## License
 
 MIT
+
+---
+
+## Part of the Preflight suite
+
+agent-gate orchestrates the full suite of AI agent pre-deploy checks:
+
+| Tool | Purpose | Install |
+|------|---------|---------|
+| **stepproof** | Behavioral regression testing | `npm install -g github:StanislavBG/stepproof` |
+| **agent-comply** | EU AI Act compliance scanning | `npm install -g github:StanislavBG/agent-comply` |
+| **agent-gate** | Unified pre-deploy CI gate | `npm install -g github:StanislavBG/agent-gate` |
+| **agent-shift** | Config versioning + environment promotion | `npm install -g github:StanislavBG/agent-shift` |
+
+Install the full suite:
+```bash
+npm install -g github:StanislavBG/agent-gate github:StanislavBG/stepproof github:StanislavBG/agent-comply github:StanislavBG/agent-shift
+```

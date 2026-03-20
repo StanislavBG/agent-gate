@@ -17,6 +17,7 @@
   "keywords": ["ai", "agent", "ci", "compliance", "eu-ai-act", "testing"],
   "license": "MIT",
   "dependencies": {
+    "@preflight/license": "file:../preflight-license",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "js-yaml": "^4.1.0"

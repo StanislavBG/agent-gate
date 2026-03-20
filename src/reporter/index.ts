@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import type { RunResult, GateResult } from '../types/index.js';
+import { guard } from '@preflight/license';
 
 export function formatSarif(result: RunResult): string {
   const rules = result.gates.map((g) => ({
@@ -118,6 +119,9 @@ function formatDetails(details: Record<string, unknown>): string {
 }
 
 export function printReport(result: RunResult, opts: { json?: boolean; format?: string } = {}): void {
+  if (opts.format === 'sarif' || opts.format === 'junit') {
+    guard('team', { feature: `--format ${opts.format}` });
+  }
   if (opts.format === 'sarif') {
     process.stdout.write(formatSarif(result) + '\n');
     return;

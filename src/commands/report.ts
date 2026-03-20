@@ -1,6 +1,7 @@
 import { loadConfig } from '../config/index.js';
 import { runAllGates } from '../runner/index.js';
 import { printReport } from '../reporter/index.js';
+import { guard } from '@preflight/license';
 import chalk from 'chalk';
 
 interface ReportOpts {
@@ -14,6 +15,11 @@ interface ReportOpts {
  * Always exits 0 — suitable for dashboards and audit logs.
  */
 export async function runReport(opts: ReportOpts): Promise<void> {
+  // Gate paid formats immediately — before running all gates
+  if (opts.format === 'sarif' || opts.format === 'junit') {
+    guard('team', { feature: `--format ${opts.format}` });
+  }
+
   let config;
   try {
     config = loadConfig(opts.config);

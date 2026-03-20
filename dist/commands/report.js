@@ -1,12 +1,17 @@
 import { loadConfig } from '../config/index.js';
 import { runAllGates } from '../runner/index.js';
 import { printReport } from '../reporter/index.js';
+import { guard } from '@preflight/license';
 import chalk from 'chalk';
 /**
  * 'report' command: runs gates and outputs detailed report without CI exit semantics.
  * Always exits 0 — suitable for dashboards and audit logs.
  */
 export async function runReport(opts) {
+    // Gate paid formats immediately — before running all gates
+    if (opts.format === 'sarif' || opts.format === 'junit') {
+        guard('team', { feature: `--format ${opts.format}` });
+    }
     let config;
     try {
         config = loadConfig(opts.config);

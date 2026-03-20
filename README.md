@@ -198,17 +198,23 @@ agent-gate:
 
 ---
 
-## How it relates to the other tools
+## Part of the Preflight suite
 
-agent-gate doesn't replace Stepproof or agent-comply — it orchestrates them:
+agent-gate is one tool in a suite of AI agent pre-deploy checks:
 
-| Tool | What it does |
-|------|-------------|
-| **stepproof** | Runs scenario regression tests against your agent |
-| **agent-comply** | Scans for EU AI Act compliance violations |
-| **agent-gate** | Runs both + cost check → unified pass/fail verdict |
+| Tool | Purpose | Install |
+|------|---------|---------|
+| **stepproof** | Behavioral regression testing | `npm install -g github:StanislavBG/stepproof` |
+| **agent-comply** | EU AI Act compliance scanning | `npm install -g github:StanislavBG/agent-comply` |
+| **agent-gate** | Unified pre-deploy CI gate | `npm install -g github:StanislavBG/agent-gate` |
+| **agent-shift** | Config versioning + environment promotion | `npm install -g github:StanislavBG/agent-shift` |
 
-Use Stepproof and agent-comply directly during development. Use agent-gate in CI as the final deploy gate.
+Install the full suite:
+```bash
+npm install -g github:StanislavBG/agent-gate github:StanislavBG/stepproof github:StanislavBG/agent-comply github:StanislavBG/agent-shift
+```
+
+agent-gate doesn't replace stepproof or agent-comply — it orchestrates them. Use them directly during development. Use agent-gate in CI as the final deploy gate.
 
 ---
 

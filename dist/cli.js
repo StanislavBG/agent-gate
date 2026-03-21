@@ -7,7 +7,13 @@ const program = new Command();
 program
     .name('agent-gate')
     .description('Pre-deploy CI gate for AI agents: regression tests + compliance + cost — unified pass/fail')
-    .version('0.2.0');
+    .version('0.2.0')
+    .addHelpText('after', `
+Examples:
+  agent-gate init           scaffold .agent-gate.yaml (interactive setup)
+  agent-gate run            run all gates, exit 1 on any failure (use in CI)
+  agent-gate report         detailed report, always exits 0 (use for logs)
+  agent-gate run --format sarif --output gate-results.sarif`);
 program
     .command('init')
     .description('Scaffold .agent-gate.yaml config in the current directory')

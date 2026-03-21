@@ -1,4 +1,6 @@
 import chalk from 'chalk';
+import { writeFileSync } from 'fs';
+import { resolve } from 'path';
 import { guard } from '@preflight/license';
 export function formatSarif(result) {
     const rules = result.gates.map((g) => ({
@@ -108,12 +110,14 @@ export function printReport(result, opts = {}) {
     if (opts.format === 'sarif' || opts.format === 'junit') {
         guard('team', { feature: `--format ${opts.format}` });
     }
-    if (opts.format === 'sarif') {
-        process.stdout.write(formatSarif(result) + '\n');
-        return;
-    }
-    if (opts.format === 'junit') {
-        process.stdout.write(formatJunit(result) + '\n');
+    if (opts.format === 'sarif' || opts.format === 'junit') {
+        const formatted = opts.format === 'sarif' ? formatSarif(result) : formatJunit(result);
+        if (opts.output) {
+            writeFileSync(resolve(opts.output), formatted, 'utf-8');
+        }
+        else {
+            process.stdout.write(formatted + '\n');
+        }
         return;
     }
     if (opts.json) {

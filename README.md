@@ -233,6 +233,47 @@ Gate failures (regression tests, compliance violations, cost overruns) appear as
 
 ---
 
+## Troubleshooting
+
+### `Config not found. Run: agent-gate init`
+You haven't created `.agent-gate.yaml` yet. Run:
+```bash
+agent-gate init
+```
+Then edit `.agent-gate.yaml` to match your project structure.
+
+### `stepproof: command not found` or `agent-comply: command not found`
+agent-gate shells out to these tools — they must be installed globally:
+```bash
+npm install -g stepproof agent-comply
+```
+
+### All gates pass but I know something is broken
+Check that your `stepproof.scenarios` path in `.agent-gate.yaml` points to the right directory. Gate uses the path as-is — a wrong directory will produce 0 scenarios and auto-pass.
+
+### `Error: --format must be "sarif" or "junit"`
+Only `sarif` and `junit` are valid. For terminal output, omit `--format`:
+```bash
+agent-gate run                        # terminal output (default)
+agent-gate run --format sarif         # SARIF for GitHub Security tab
+```
+
+### Gate exits 1 in CI but I want a report without blocking
+Use `--no-fail` to always exit 0:
+```bash
+agent-gate run --no-fail --json > gate-report.json
+```
+Or use `agent-gate report` (which never exits 1).
+
+### SARIF / JUnit output requires a license
+```bash
+export PREFLIGHT_LICENSE_KEY=preflight_...
+agent-gate run --format sarif --output gate-results.sarif
+```
+Get a license at the [Preflight pricing page](https://stanislavbg.github.io/preflight/).
+
+---
+
 ## Roadmap
 
 **v0.2.0 (current):** Parallel gate execution, unified pass/fail, JSON output, SARIF/JUnit structured reports, GitHub Actions integration

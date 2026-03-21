@@ -1,0 +1,23 @@
+# .agent-gate.yaml — example agent-gate configuration
+# Run `agent-gate init` to scaffold this in your own project.
+# Run `agent-gate run` to execute all gates and get a unified verdict.
+
+# Regression testing gate — shells out to stepproof
+# Set to false to disable: stepproof: false
+stepproof:
+  scenarios: ./scenarios/          # path to your stepproof YAML files (file or directory)
+  threshold: all                   # 'all' = every scenario must pass; or a number, e.g. 0.9 for 90%
+
+# Compliance gate — shells out to agent-comply
+# Set to false to disable: comply: false
+comply:
+  policy: .agent-comply/policy.yaml  # path to your compliance policy file
+
+# Cost estimation gate — runs offline from this config
+# Set to false to disable: cost: false
+cost:
+  budget_per_run: "$0.50"          # warn if estimated cost exceeds this
+  model_allowlist:
+    - claude-sonnet-4-6
+    - claude-haiku-4-5-20251001
+    - gpt-4o-mini

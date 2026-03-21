@@ -1,0 +1,47 @@
+# .github/workflows/agent-gate.yml
+# Complete GitHub Actions workflow for agent-gate CI integration.
+# Copy this to .github/workflows/ in your own repo.
+
+name: Agent Gate
+
+on: [push, pull_request]
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Preflight suite
+        run: |
+          npm install -g github:StanislavBG/stepproof \
+                         github:StanislavBG/agent-comply \
+                         github:StanislavBG/agent-gate
+
+      - name: Run agent-gate
+        run: agent-gate run --json > gate-report.json
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Upload gate report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gate-report
+          path: gate-report.json
+
+      # Optional: upload SARIF to GitHub Security tab
+      # - name: Run agent-gate (SARIF)
+      #   run: agent-gate run --format sarif > gate-results.sarif
+      #
+      # - name: Upload to GitHub Security tab
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   with:
+      #     sarif_file: gate-results.sarif
+      #   if: always()

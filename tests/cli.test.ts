@@ -186,6 +186,23 @@ describe('agent-gate CLI — input sanitization', () => {
     expect(code).toBe(2);
     expect(stderr).toContain('null');
   });
+
+  it('init with null byte in --output → exits 2', () => {
+    const { code, stderr } = run(['init', '--output', 'out\0put.yaml']);
+    expect(code).toBe(2);
+    expect(stderr).toContain('null');
+  });
+});
+
+describe('agent-gate CLI — init idempotency', () => {
+  it('init twice in same dir → exits 0 both times', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-gate-idem-'));
+    const { code: code1 } = run(['init'], tmpDir);
+    expect(code1).toBe(0);
+    const { code: code2 } = run(['init'], tmpDir);
+    expect(code2).toBe(0);
+    fs.rmSync(tmpDir, { recursive: true });
+  });
 });
 
 describe('agent-gate CLI — subcommand help', () => {

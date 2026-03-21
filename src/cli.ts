@@ -22,6 +22,10 @@ program
   .description('Scaffold .agent-gate.yaml config in the current directory')
   .option('--output <path>', 'Output path (default: .agent-gate.yaml)')
   .action((opts: { output?: string }) => {
+    if (opts.output && opts.output.includes('\0')) {
+      process.stderr.write('\nError: Invalid --output path — null bytes are not allowed\n');
+      process.exit(2);
+    }
     runInit(opts.output);
   });
 

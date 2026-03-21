@@ -27,7 +27,13 @@ export function loadConfig(configPath?: string): GateConfig {
   }
 
   const raw = readFileSync(path, 'utf-8');
-  const parsed = yaml.load(raw) as Record<string, unknown>;
+  const loaded = yaml.load(raw);
+
+  if (!loaded || typeof loaded !== 'object' || Array.isArray(loaded)) {
+    throw new Error(`Config file is empty or not a valid YAML object: ${path}`);
+  }
+
+  const parsed = loaded as Record<string, unknown>;
 
   return mergeWithDefaults(parsed);
 }

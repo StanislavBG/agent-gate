@@ -9,6 +9,12 @@ const TMP = path.join(os.tmpdir(), 'agent-gate-config-test');
 beforeAll(() => {
   fs.mkdirSync(TMP, { recursive: true });
 
+  // Empty config file — should throw clear error
+  fs.writeFileSync(path.join(TMP, 'empty.yaml'), '');
+
+  // YAML array at top level — should throw clear error
+  fs.writeFileSync(path.join(TMP, 'array.yaml'), '- item1\n- item2\n');
+
   // Minimal: stepproof only, others disabled
   fs.writeFileSync(
     path.join(TMP, 'minimal.yaml'),
@@ -70,6 +76,14 @@ describe('loadConfig', () => {
     } catch (e) {
       expect((e as Error).message).toContain('agent-gate init');
     }
+  });
+
+  it('throws a clear error on empty config file', () => {
+    expect(() => loadConfig(path.join(TMP, 'empty.yaml'))).toThrow(/empty or not a valid YAML object/);
+  });
+
+  it('throws a clear error when config is a YAML array instead of object', () => {
+    expect(() => loadConfig(path.join(TMP, 'array.yaml'))).toThrow(/empty or not a valid YAML object/);
   });
 
   it('loads minimal config with comply and cost disabled', () => {

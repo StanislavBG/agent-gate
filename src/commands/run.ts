@@ -8,6 +8,7 @@ interface RunOpts {
   config?: string;
   json?: boolean;
   format?: string;
+  output?: string;
   fail?: boolean; // commander sets fail=false when --no-fail is passed
 }
 
@@ -30,7 +31,7 @@ export async function runRun(opts: RunOpts): Promise<void> {
 
   try {
     const result = await runAllGates(config, cwd);
-    printReport(result, { json: opts.json, format: opts.format });
+    printReport(result, { json: opts.json, format: opts.format, output: opts.output });
     exitWithVerdict(result, opts.fail === false);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);

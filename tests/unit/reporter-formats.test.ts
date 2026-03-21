@@ -1,4 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
+import { writeFileSync, readFileSync, unlinkSync, existsSync } from 'fs';
+import { resolve } from 'path';
+import os from 'os';
 import type { GateResult, RunResult } from '../../src/types/index.js';
 import { formatSarif, formatJunit } from '../../src/reporter/index.js';
 
@@ -230,5 +233,35 @@ describe('formatJunit', () => {
     const result = makeRunResult([makeGate('stepproof', true), gate]);
     const xml = formatJunit(result);
     expect(xml).toContain('failures="0"');
+  });
+});
+
+// ── --output <file> behavior ─────────────────────────────────────────────────
+
+describe('--output file writing', () => {
+  const tmpFile = resolve(os.tmpdir(), `agent-gate-test-${Date.now()}.sarif`);
+
+  afterEach(() => {
+    if (existsSync(tmpFile)) unlinkSync(tmpFile);
+  });
+
+  it('formatSarif output can be written to a file and read back as valid SARIF', () => {
+    const result = makeRunResult([makeGate('stepproof', true)]);
+    const sarif = formatSarif(result);
+    writeFileSync(tmpFile, sarif, 'utf-8');
+    const contents = readFileSync(tmpFile, 'utf-8');
+    const parsed = JSON.parse(contents);
+    expect(parsed.version).toBe('2.1.0');
+    expect(parsed.runs[0].tool.driver.name).toBe('agent-gate');
+  });
+
+  it('formatJunit output can be written to a file and read back as valid XML', () => {
+    const result = makeRunResult([makeGate('comply', false)]);
+    const xml = formatJunit(result);
+    writeFileSync(tmpFile, xml, 'utf-8');
+    const contents = readFileSync(tmpFile, 'utf-8');
+    expect(contents).toContain('<?xml version="1.0" encoding="UTF-8"?>');
+    expect(contents).toContain('<testsuites');
+    expect(contents).toContain('name="agent-gate"');
   });
 });

@@ -25,8 +25,9 @@ program
   .option('--config <path>', 'Path to .agent-gate.yaml (default: .agent-gate.yaml)')
   .option('--json', 'Output result as JSON')
   .option('--format <format>', 'Output format: sarif or junit')
+  .option('--output <file>', 'Write format output to file instead of stdout')
   .option('--no-fail', 'Exit 0 even on gate failures (report-only mode)')
-  .action((opts: { config?: string; json?: boolean; format?: string; fail?: boolean }) => {
+  .action((opts: { config?: string; json?: boolean; format?: string; output?: string; fail?: boolean }) => {
     runRun(opts);
   });
 
@@ -36,7 +37,8 @@ program
   .option('--config <path>', 'Path to .agent-gate.yaml (default: .agent-gate.yaml)')
   .option('--json', 'Output as JSON')
   .option('--format <format>', 'Output format: sarif or junit')
-  .action((opts: { config?: string; json?: boolean; format?: string }) => {
+  .option('--output <file>', 'Write format output to file instead of stdout')
+  .action((opts: { config?: string; json?: boolean; format?: string; output?: string }) => {
     runReport(opts);
   });
 

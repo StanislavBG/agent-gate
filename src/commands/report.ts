@@ -8,6 +8,7 @@ interface ReportOpts {
   config?: string;
   json?: boolean;
   format?: string;
+  output?: string;
 }
 
 /**
@@ -33,7 +34,7 @@ export async function runReport(opts: ReportOpts): Promise<void> {
 
   try {
     const result = await runAllGates(config, cwd);
-    printReport(result, { json: opts.json, format: opts.format });
+    printReport(result, { json: opts.json, format: opts.format, output: opts.output });
     // report command: always exit 0
     process.exit(0);
   } catch (err) {

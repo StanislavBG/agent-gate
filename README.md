@@ -1,6 +1,6 @@
 # agent-gate
 
-[![Part of Preflight](https://img.shields.io/badge/suite-Preflight-blue)](https://github.com/StanislavBG/agent-gate)
+[![Part of Preflight](https://img.shields.io/badge/suite-Preflight-blue)](https://www.npmjs.com/package/@bilkobibitkov/agent-gate)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)]()
 [![License](https://img.shields.io/badge/license-MIT-green)]()
 
@@ -58,13 +58,13 @@ agent-gate run
 
 Shells out to `stepproof run` against your scenario YAML files. Each scenario defines inputs, expected outputs, and pass criteria. Gate fails if any scenario fails (or if pass rate drops below your threshold).
 
-**Requires:** [stepproof](https://github.com/StanislavBG/stepproof) installed
+**Requires:** [stepproof](https://www.npmjs.com/package/stepproof) installed
 
 ### 2. agent-comply — EU AI Act compliance
 
 Shells out to `agent-comply scan` against your source directory. Gate fails if any classified model usage violates your policy file.
 
-**Requires:** [agent-comply](https://github.com/StanislavBG/agent-comply) installed
+**Requires:** [agent-comply](https://www.npmjs.com/package/agent-comply) installed
 
 ### 3. Cost estimation
 

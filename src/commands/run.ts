@@ -24,7 +24,10 @@ export async function runRun(opts: RunOpts): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(chalk.red(`Error: ${msg}`));
-    process.exit(1);
+    if (!opts.config) {
+      console.error(chalk.dim('No config found. Run: agent-gate init'));
+    }
+    process.exit(2);
   }
 
   const cwd = process.cwd();

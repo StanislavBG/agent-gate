@@ -38,5 +38,15 @@ export function runInit(outputPath?: string): void {
 
   writeFileSync(dest, SCAFFOLD, 'utf-8');
   console.log(chalk.green(`✔ Created ${dest}`));
-  console.log(chalk.dim('Edit the config, then run: agent-gate run'));
+  console.log('');
+  console.log('agent-gate is the pre-deploy CI gate for the Preflight suite.');
+  console.log('It orchestrates: regression tests + compliance + cost — unified pass/fail.');
+  console.log('');
+  console.log('Next:');
+  console.log('  1. Edit .agent-gate.yaml to configure your gates');
+  console.log(`  2. ${chalk.cyan('agent-gate run')}      — run all gates, exit 1 on any failure`);
+  console.log(`  3. ${chalk.cyan('agent-gate report')}   — detailed report, always exit 0`);
+  console.log('');
+  console.log('Your .agent-gate.yaml references stepproof and agent-comply.');
+  console.log('Install the full suite: npm install -g stepproof agent-comply agent-shift agent-trace');
 }

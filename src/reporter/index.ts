@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import type { RunResult, GateResult } from '../types/index.js';
-import { guard } from '@preflight/license';
+import { guard } from '@bilkobibitkov/preflight-license';
 
 export function formatSarif(result: RunResult): string {
   const rules = result.gates.map((g) => ({

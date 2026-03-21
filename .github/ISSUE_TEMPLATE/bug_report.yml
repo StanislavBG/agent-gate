@@ -1,0 +1,91 @@
+name: Bug Report
+description: Something isn't working right with agent-gate
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. agent-gate is the unified CI gate for the Preflight Suite — it orchestrates stepproof and agent-comply. Please include your .agent-gate.yaml config and the full output.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      placeholder: "When I run `npx agent-gate run`, the verdict says PASS but stepproof reported failures..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run `npx agent-gate init`
+        2. Configure .agent-gate.yaml with stepproof + agent-comply
+        3. Run `npx agent-gate run`
+        4. See incorrect verdict...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Your .agent-gate.yaml
+      description: Paste your gate config here — it's essential for diagnosing routing issues.
+      render: yaml
+
+  - type: dropdown
+    id: command
+    attributes:
+      label: Which command?
+      options:
+        - agent-gate init
+        - agent-gate run
+        - agent-gate check
+        - agent-gate report
+        - Other / not command-specific
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      placeholder: "e.g. 20.11.0 — run `node --version`"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "e.g. macOS 14, Ubuntu 22.04"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: agent-gate version
+      placeholder: "run `npx agent-gate --version`"
+    validations:
+      required: true
+
+  - type: textarea
+    id: sub-tools
+    attributes:
+      label: stepproof / agent-comply versions (if installed)
+      placeholder: "stepproof: 0.1.0, agent-comply: 0.1.0"
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Full terminal output
+      render: shell

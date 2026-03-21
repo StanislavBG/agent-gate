@@ -9,8 +9,7 @@
 Pre-deploy readiness gate for AI agents. Runs regression tests (Stepproof), compliance scan (agent-comply), and cost estimation in parallel — then exits 0 or 1.
 
 ```bash
-# Install from GitHub (npm package coming soon)
-npm install -g github:StanislavBG/agent-gate github:StanislavBG/stepproof github:StanislavBG/agent-comply
+npm install -g agent-gate stepproof agent-comply
 agent-gate run
 ```
 
@@ -27,8 +26,7 @@ Shipping an AI agent to production requires three separate checks: did the behav
 ## 30-second quickstart
 
 ```bash
-# Install from GitHub (npm package coming soon)
-npm install -g github:StanislavBG/agent-gate github:StanislavBG/stepproof github:StanislavBG/agent-comply
+npm install -g agent-gate stepproof agent-comply
 
 # Scaffold config
 agent-gate init
@@ -38,7 +36,7 @@ agent-gate run
 
 # Output:
 # ╔══════════════════════════════════════╗
-# ║  agent-gate v0.1  — 3 gates          ║
+# ║  agent-gate v0.2.0  — 3 gates        ║
 # ╚══════════════════════════════════════╝
 #
 # ✓  stepproof    12/12 scenarios passed    (4.2s)
@@ -122,6 +120,8 @@ agent-gate run                          # uses .agent-gate.yaml
 agent-gate run --config ./ci/gate.yaml  # custom config path
 agent-gate run --json                   # JSON output (for CI artifacts)
 agent-gate run --no-fail                # always exit 0 (report-only)
+agent-gate run --format sarif           # SARIF 2.1.0 output
+agent-gate run --format junit           # JUnit XML output
 ```
 
 **Exit codes:**
@@ -139,12 +139,16 @@ agent-gate init --output ./ci/gate.yaml # custom output path
 
 ### `agent-gate report`
 
-Generate a detailed compliance report from last run results.
+Run all gates and generate a detailed report (always exits 0).
 
 ```bash
-agent-gate report
-agent-gate report --json
+agent-gate report                       # human-readable terminal output
+agent-gate report --json                # JSON format
+agent-gate report --format junit        # JUnit XML format
+agent-gate report --format sarif        # SARIF 2.1.0 format
 ```
+
+Use `--format` to control output format. The `report` command always exits 0 regardless of gate results — it is for inspection, not enforcement.
 
 ---
 
@@ -169,7 +173,7 @@ jobs:
 
       - name: Install gates
         run: |
-          npm install -g github:StanislavBG/stepproof github:StanislavBG/agent-comply github:StanislavBG/agent-gate
+          npm install -g stepproof agent-comply agent-gate
 
       - name: Run agent-gate
         run: agent-gate run --json > gate-report.json
@@ -188,7 +192,7 @@ jobs:
 agent-gate:
   image: node:20
   script:
-    - npm install -g github:StanislavBG/stepproof github:StanislavBG/agent-comply github:StanislavBG/agent-gate
+    - npm install -g stepproof agent-comply agent-gate
     - agent-gate run
   artifacts:
     when: always
@@ -198,7 +202,7 @@ agent-gate:
 
 ---
 
-## Structured reports (v0.2.0)
+## Structured reports
 
 agent-gate outputs machine-readable SARIF 2.1.0 and JUnit XML for CI pipeline integration.
 
@@ -229,32 +233,13 @@ Gate failures (regression tests, compliance violations, cost overruns) appear as
 
 ---
 
-## Part of the Preflight suite
-
-agent-gate is one tool in a suite of AI agent pre-deploy checks:
-
-| Tool | Purpose | Install |
-|------|---------|---------|
-| **stepproof** | Behavioral regression testing | `npm install -g github:StanislavBG/stepproof` |
-| **agent-comply** | EU AI Act compliance scanning | `npm install -g github:StanislavBG/agent-comply` |
-| **agent-gate** | Unified pre-deploy CI gate | `npm install -g github:StanislavBG/agent-gate` |
-| **agent-shift** | Config versioning + environment promotion | `npm install -g github:StanislavBG/agent-shift` |
-| **agent-trace** | Local observability — OTel traces in SQLite | `npm install -g github:StanislavBG/agent-trace` |
-
-Install the full suite:
-```bash
-npm install -g github:StanislavBG/agent-gate github:StanislavBG/stepproof github:StanislavBG/agent-comply github:StanislavBG/agent-shift github:StanislavBG/agent-trace
-```
-
-agent-gate doesn't replace stepproof or agent-comply — it orchestrates them. Use them directly during development. Use agent-gate in CI as the final deploy gate.
-
----
-
 ## Roadmap
 
-**v0.1 (current):** Parallel gate execution, unified pass/fail, JSON output, GitHub Actions integration
-**v0.2:** Custom gate plugins, per-gate timeouts, Slack/webhook notifications, dashboard report
-**v0.3:** Historical trend tracking, cost forecasting, gate skip rules per branch
+**v0.2.0 (current):** Parallel gate execution, unified pass/fail, JSON output, SARIF/JUnit structured reports, GitHub Actions integration
+
+**v0.3.0 (next):** Custom gate plugins, per-gate timeouts, Slack/webhook notifications, dashboard report
+
+**v0.4.0:** Historical trend tracking, cost forecasting, gate skip rules per branch
 
 ---
 
@@ -266,17 +251,17 @@ MIT
 
 ## Part of the Preflight suite
 
-agent-gate orchestrates the full suite of AI agent pre-deploy checks:
+agent-gate is one tool in a suite of AI agent pre-deploy checks. It orchestrates stepproof and agent-comply — use them directly during development, use agent-gate in CI as the final deploy gate.
 
 | Tool | Purpose | Install |
 |------|---------|---------|
-| **stepproof** | Behavioral regression testing | `npm install -g github:StanislavBG/stepproof` |
-| **agent-comply** | EU AI Act compliance scanning | `npm install -g github:StanislavBG/agent-comply` |
-| **agent-gate** | Unified pre-deploy CI gate | `npm install -g github:StanislavBG/agent-gate` |
-| **agent-shift** | Config versioning + environment promotion | `npm install -g github:StanislavBG/agent-shift` |
-| **agent-trace** | Local observability — OTel traces in SQLite | `npm install -g github:StanislavBG/agent-trace` |
+| **stepproof** | Behavioral regression testing | `npm install -g stepproof` |
+| **agent-comply** | EU AI Act compliance scanning | `npm install -g agent-comply` |
+| **agent-gate** | Unified pre-deploy CI gate | `npm install -g agent-gate` |
+| **agent-shift** | Config versioning + environment promotion | `npm install -g agent-shift` |
+| **agent-trace** | Local observability — OTel traces in SQLite | `npm install -g agent-trace` |
 
 Install the full suite:
 ```bash
-npm install -g github:StanislavBG/agent-gate github:StanislavBG/stepproof github:StanislavBG/agent-comply github:StanislavBG/agent-shift github:StanislavBG/agent-trace
+npm install -g agent-gate stepproof agent-comply agent-shift agent-trace
 ```

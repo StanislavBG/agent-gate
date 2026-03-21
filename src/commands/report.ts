@@ -1,7 +1,7 @@
 import { loadConfig } from '../config/index.js';
 import { runAllGates } from '../runner/index.js';
 import { printReport } from '../reporter/index.js';
-import { guard } from '@preflight/license';
+import { guard } from '@bilkobibitkov/preflight-license';
 import chalk from 'chalk';
 
 interface ReportOpts {

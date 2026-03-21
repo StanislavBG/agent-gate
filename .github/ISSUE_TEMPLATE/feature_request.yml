@@ -1,0 +1,59 @@
+name: Feature Request
+description: Suggest a new gate check, CI integration, or output format
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        agent-gate orchestrates the full Preflight Suite pre-deploy check. Good requests focus on the gate layer — verdict logic, integrations, config — not the underlying tools (stepproof, agent-comply have their own trackers).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      placeholder: "When deploying AI agents to production, I need agent-gate to also check..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: What would you like to see?
+      placeholder: |
+        A `cost-check` gate that fails if the agent's estimated per-run cost exceeds a threshold:
+        ```yaml
+        # .agent-gate.yaml
+        gates:
+          cost-check:
+            max-cost-usd: 0.05
+        ```
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area?
+      options:
+        - New gate type / check
+        - Verdict aggregation logic
+        - CI integration (GitHub Actions, GitLab, Jenkins)
+        - Config format (.agent-gate.yaml)
+        - Output / reporting format
+        - Parallelization / performance
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Would you be willing to contribute this?
+      options:
+        - label: Yes, I'd like to open a PR for this

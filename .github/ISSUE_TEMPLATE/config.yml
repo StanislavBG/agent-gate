@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a question
+    url: https://github.com/StanislavBG/agent-gate/discussions/new?category=q-a
+    about: Not sure if it's a bug? Ask in Discussions first.
+  - name: Show & Tell
+    url: https://github.com/StanislavBG/agent-gate/discussions/new?category=show-and-tell
+    about: Share your CI gate configuration, deployment workflow, or agent-gate integrations.
+  - name: Documentation
+    url: https://github.com/StanislavBG/agent-gate/blob/main/README.md
+    about: README with full CLI reference and .agent-gate.yaml schema.
+  - name: Preflight Suite
+    url: https://github.com/StanislavBG/agent-gate
+    about: agent-gate is the hub of the Preflight Suite — explore stepproof and agent-comply for individual checks.

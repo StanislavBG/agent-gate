@@ -1,0 +1,34 @@
+title: "[Show] "
+labels: ["show-and-tell"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Running agent-gate in your CI pipeline? Built a custom gate config? Deployed it as a required status check before AI agent releases? Show the community your setup.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What did you build?
+      placeholder: "We gate all our AI agent deployments through agent-gate — stepproof regression + agent-comply EU AI Act check. Here's our setup..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: how
+    attributes:
+      label: How does it work?
+      description: Share your .agent-gate.yaml, GitHub Actions workflow, or equivalent.
+    validations:
+      required: true
+
+  - type: input
+    id: link
+    attributes:
+      label: Link (optional)
+      placeholder: "https://github.com/yourname/your-project"
+
+  - type: textarea
+    id: lessons
+    attributes:
+      label: Lessons learned

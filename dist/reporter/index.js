@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
-import { guard } from '@preflight/license';
+import { guard } from '@bilkobibitkov/preflight-license';
 export function formatSarif(result) {
     const rules = result.gates.map((g) => ({
         id: g.gate,

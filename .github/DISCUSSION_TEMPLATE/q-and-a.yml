@@ -1,0 +1,35 @@
+title: "[Question] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Stuck on something? Ask here. Include your .agent-gate.yaml and the full command output.
+
+        For bugs, use a [Bug Report issue](https://github.com/StanislavBG/agent-gate/issues/new?template=bug_report.yml) instead.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: What do you need help with?
+      placeholder: "When agent-gate runs in GitHub Actions, the exit code is 0 even though one gate failed..."
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      placeholder: "e.g. 20.11.0"
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "e.g. macOS 14, Ubuntu 22.04"
+
+  - type: input
+    id: version
+    attributes:
+      label: agent-gate version
+      placeholder: "run `npx agent-gate --version`"

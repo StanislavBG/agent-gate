@@ -16,6 +16,11 @@ interface ReportOpts {
  * Always exits 0 — suitable for dashboards and audit logs.
  */
 export async function runReport(opts: ReportOpts): Promise<void> {
+  if (opts.format && opts.format !== 'sarif' && opts.format !== 'junit') {
+    console.error(chalk.red(`Error: --format must be "sarif" or "junit", got "${opts.format}"`));
+    process.exit(2);
+  }
+
   // Gate paid formats immediately — before running all gates
   if (opts.format === 'sarif' || opts.format === 'junit') {
     guard('team', { feature: `--format ${opts.format}` });
@@ -27,9 +32,6 @@ export async function runReport(opts: ReportOpts): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(chalk.red(`Error: ${msg}`));
-    if (!opts.config) {
-      console.error(chalk.dim('No config found. Run: agent-gate init'));
-    }
     process.exit(2);
   }
 

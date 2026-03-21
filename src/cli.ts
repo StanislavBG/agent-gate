@@ -34,6 +34,12 @@ program
   .option('--output <file>', 'Write format output to file instead of stdout')
   .option('--no-fail', 'Exit 0 even on gate failures (report-only mode)')
   .action((opts: { config?: string; json?: boolean; format?: string; output?: string; fail?: boolean }) => {
+    for (const [flag, val] of [['--config', opts.config], ['--output', opts.output]] as [string, string | undefined][]) {
+      if (val && val.includes('\0')) {
+        process.stderr.write(`\nError: Invalid ${flag} path — null bytes are not allowed\n`);
+        process.exit(2);
+      }
+    }
     runRun(opts);
   });
 
@@ -45,6 +51,12 @@ program
   .option('--format <format>', 'Output format: sarif or junit')
   .option('--output <file>', 'Write format output to file instead of stdout')
   .action((opts: { config?: string; json?: boolean; format?: string; output?: string }) => {
+    for (const [flag, val] of [['--config', opts.config], ['--output', opts.output]] as [string, string | undefined][]) {
+      if (val && val.includes('\0')) {
+        process.stderr.write(`\nError: Invalid ${flag} path — null bytes are not allowed\n`);
+        process.exit(2);
+      }
+    }
     runReport(opts);
   });
 

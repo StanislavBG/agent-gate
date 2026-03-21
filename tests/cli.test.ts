@@ -11,16 +11,22 @@ import * as os from 'os';
 const CLI = path.resolve(__dirname, '../dist/cli.js');
 
 function run(args: string[], cwd?: string) {
-  const result = spawnSync(process.execPath, [CLI, ...args], {
-    cwd: cwd ?? os.tmpdir(),
-    encoding: 'utf-8',
-    timeout: 15000,
-  });
-  return {
-    code: result.status ?? 1,
-    stdout: result.stdout ?? '',
-    stderr: result.stderr ?? '',
-  };
+  try {
+    const result = spawnSync(process.execPath, [CLI, ...args], {
+      cwd: cwd ?? os.tmpdir(),
+      encoding: 'utf-8',
+      timeout: 15000,
+    });
+    return {
+      code: result.status ?? 1,
+      stdout: result.stdout ?? '',
+      stderr: result.stderr ?? '',
+    };
+  } catch (e) {
+    // Node.js rejects null bytes in spawn args before the process starts —
+    // this is the OS-level rejection of malformed input, equivalent to exit 2.
+    return { code: 2, stdout: '', stderr: String(e) };
+  }
 }
 
 const MINIMAL_CONFIG = `
@@ -132,6 +138,76 @@ describe('agent-gate CLI — init command', () => {
     const { code } = run(['init', '--output', outPath], tmpDir);
     expect(code).toBe(0);
     expect(fs.existsSync(outPath)).toBe(true);
+    fs.rmSync(tmpDir, { recursive: true });
+  });
+});
+
+describe('agent-gate CLI — format validation', () => {
+  it('run --format csv → exits 2 with clear message', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-gate-fmt-run-'));
+    fs.writeFileSync(path.join(tmpDir, '.agent-gate.yaml'), MINIMAL_CONFIG);
+    const { code, stderr } = run(['run', '--format', 'csv'], tmpDir);
+    expect(code).toBe(2);
+    expect(stderr).toContain('--format');
+    expect(stderr).toContain('csv');
+    fs.rmSync(tmpDir, { recursive: true });
+  });
+
+  it('report --format csv → exits 2 with clear message', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-gate-fmt-report-'));
+    fs.writeFileSync(path.join(tmpDir, '.agent-gate.yaml'), MINIMAL_CONFIG);
+    const { code, stderr } = run(['report', '--format', 'csv'], tmpDir);
+    expect(code).toBe(2);
+    expect(stderr).toContain('--format');
+    expect(stderr).toContain('csv');
+    fs.rmSync(tmpDir, { recursive: true });
+  });
+});
+
+describe('agent-gate CLI — --no-fail flag', () => {
+  it('run --no-fail with all gates disabled → exits 0', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-gate-nofail-'));
+    fs.writeFileSync(path.join(tmpDir, '.agent-gate.yaml'), MINIMAL_CONFIG);
+    const { code } = run(['run', '--no-fail'], tmpDir);
+    expect(code).toBe(0);
+    fs.rmSync(tmpDir, { recursive: true });
+  });
+});
+
+describe('agent-gate CLI — input sanitization', () => {
+  it('run with null byte in --config → exits 2', () => {
+    const { code, stderr } = run(['run', '--config', 'conf\0ig.yaml']);
+    expect(code).toBe(2);
+    expect(stderr).toContain('null');
+  });
+
+  it('report with null byte in --config → exits 2', () => {
+    const { code, stderr } = run(['report', '--config', 'conf\0ig.yaml']);
+    expect(code).toBe(2);
+    expect(stderr).toContain('null');
+  });
+});
+
+describe('agent-gate CLI — subcommand help', () => {
+  it('run --help → exits 0 and lists run options', () => {
+    const { code, stdout } = run(['run', '--help']);
+    expect(code).toBe(0);
+    expect(stdout).toContain('--config');
+    expect(stdout).toContain('--format');
+  });
+
+  it('report --help → exits 0 and lists report options', () => {
+    const { code, stdout } = run(['report', '--help']);
+    expect(code).toBe(0);
+    expect(stdout).toContain('--config');
+  });
+
+  it('report --json with all gates disabled → outputs JSON', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-gate-rj-'));
+    fs.writeFileSync(path.join(tmpDir, '.agent-gate.yaml'), MINIMAL_CONFIG);
+    const { code, stdout } = run(['report', '--json'], tmpDir);
+    expect(code).toBe(0);
+    expect(() => JSON.parse(stdout)).not.toThrow();
     fs.rmSync(tmpDir, { recursive: true });
   });
 });

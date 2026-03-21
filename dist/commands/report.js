@@ -8,6 +8,10 @@ import chalk from 'chalk';
  * Always exits 0 — suitable for dashboards and audit logs.
  */
 export async function runReport(opts) {
+    if (opts.format && opts.format !== 'sarif' && opts.format !== 'junit') {
+        console.error(chalk.red(`Error: --format must be "sarif" or "junit", got "${opts.format}"`));
+        process.exit(2);
+    }
     // Gate paid formats immediately — before running all gates
     if (opts.format === 'sarif' || opts.format === 'junit') {
         guard('team', { feature: `--format ${opts.format}` });

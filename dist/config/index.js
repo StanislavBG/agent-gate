@@ -21,7 +21,11 @@ export function loadConfig(configPath) {
         throw new Error(`Config not found: ${path}. Run 'agent-gate init' to scaffold one.`);
     }
     const raw = readFileSync(path, 'utf-8');
-    const parsed = yaml.load(raw);
+    const loaded = yaml.load(raw);
+    if (!loaded || typeof loaded !== 'object' || Array.isArray(loaded)) {
+        throw new Error(`Config file is empty or not a valid YAML object: ${path}`);
+    }
+    const parsed = loaded;
     return mergeWithDefaults(parsed);
 }
 function mergeWithDefaults(parsed) {

@@ -66,8 +66,14 @@ export function checkUsageLimit(): boolean {
   const usage = readUsage();
   if (usage.count >= FREE_MONTHLY_LIMIT) {
     process.stderr.write(
-      `\nYou've used ${FREE_MONTHLY_LIMIT}/${FREE_MONTHLY_LIMIT} free runs this month. ` +
-      `Upgrade to Preflight Team ($49/mo) for unlimited runs + SARIF/JUnit CI output → ${UPGRADE_URL}\n\n`
+      `\n─────────────────────────────────────────────────────────────\n` +
+      `  You've used all ${FREE_MONTHLY_LIMIT} free runs this month.\n\n` +
+      `  Preflight Team ($49/mo) unlocks:\n` +
+      `    · Unlimited runs          · Gates dashboard\n` +
+      `    · PDF reports             · Slack alerts\n` +
+      `    · Full run history        · SARIF/JUnit CI output\n\n` +
+      `  Upgrade → ${UPGRADE_URL}\n` +
+      `─────────────────────────────────────────────────────────────\n\n`
     );
     return false;
   }
@@ -81,8 +87,11 @@ export function trackUsageAfterRun(): void {
   writeUsage(usage);
   const remaining = FREE_MONTHLY_LIMIT - usage.count;
   process.stderr.write(
-    `\n${remaining}/${FREE_MONTHLY_LIMIT} free runs remaining this month. ` +
-    `Upgrade to Preflight Team ($49/mo) for unlimited runs + SARIF/JUnit CI output → ${UPGRADE_URL}\n`
+    `\n─────────────────────────────────────────────────────────────\n` +
+    `  ${remaining} of ${FREE_MONTHLY_LIMIT} free runs remaining this month.\n` +
+    `  Team unlocks: unlimited runs · PDF reports · Slack alerts · run history\n` +
+    `  Upgrade → ${UPGRADE_URL}\n` +
+    `─────────────────────────────────────────────────────────────\n`
   );
 }
 
@@ -91,7 +100,7 @@ const program = new Command();
 program
   .name('agent-gate')
   .description('Pre-deploy CI gate for AI agents: regression tests + compliance + cost — unified pass/fail')
-  .version('0.2.3')
+  .version('0.2.4')
   .addHelpText('after', `
 Examples:
   agent-gate init           scaffold .agent-gate.yaml (interactive setup)
@@ -123,7 +132,7 @@ program
   .description('Scaffold .agent-gate.yaml config in the current directory')
   .option('--output <path>', 'Output path (default: .agent-gate.yaml)')
   .action((opts: { output?: string }) => {
-    sendTelemetry({ command: 'init', version: '0.2.3' });
+    sendTelemetry({ command: 'init', version: '0.2.4' });
     if (opts.output && opts.output.includes('\0')) {
       process.stderr.write('\nError: Invalid --output path — null bytes are not allowed\n');
       process.exit(2);
@@ -148,7 +157,7 @@ Examples:
   agent-gate run --format sarif --output gate.sarif     SARIF for GitHub Security tab
   agent-gate run --no-fail                              always exit 0 (report-only mode)`)
   .action((opts: { config?: string; json?: boolean; format?: string; output?: string; fail?: boolean }) => {
-    sendTelemetry({ command: 'run', version: '0.2.3' });
+    sendTelemetry({ command: 'run', version: '0.2.4' });
     for (const [flag, val] of [['--config', opts.config], ['--output', opts.output]] as [string, string | undefined][]) {
       if (val && val.includes('\0')) {
         process.stderr.write(`\nError: Invalid ${flag} path — null bytes are not allowed\n`);
@@ -173,7 +182,7 @@ Examples:
   agent-gate report --json                    JSON format (pipe to jq or save to file)
   agent-gate report --format junit > results.xml  JUnit XML for CI artifact upload`)
   .action((opts: { config?: string; json?: boolean; format?: string; output?: string }) => {
-    sendTelemetry({ command: 'report', version: '0.2.3' });
+    sendTelemetry({ command: 'report', version: '0.2.4' });
     for (const [flag, val] of [['--config', opts.config], ['--output', opts.output]] as [string, string | undefined][]) {
       if (val && val.includes('\0')) {
         process.stderr.write(`\nError: Invalid ${flag} path — null bytes are not allowed\n`);

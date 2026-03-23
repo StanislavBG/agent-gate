@@ -48,6 +48,10 @@ function getOrCreateInstallId(): string {
 export interface TelemetryPayload {
   command: string;
   version: string;
+  /** Process exit code */
+  exit_code?: number;
+  /** Command wall-clock duration in milliseconds */
+  duration_ms?: number;
 }
 
 // Pending telemetry promise — drained before process.exit fires.
@@ -97,10 +101,12 @@ export function sendTelemetry(payload: TelemetryPayload): Promise<void> {
     package: 'agent-gate',
     event: 'run',
     command: payload.command,
-    success: true,
+    success: payload.exit_code === undefined ? true : payload.exit_code === 0,
     version: payload.version,
     platform: process.platform,
     nodeVersion: process.version,
+    exit_code: payload.exit_code,
+    duration_ms: payload.duration_ms,
   });
 
   const p = new Promise<void>((resolve) => {

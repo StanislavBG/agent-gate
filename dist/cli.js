@@ -8,67 +8,74 @@ import { runRun } from './commands/run.js';
 import { runReport } from './commands/report.js';
 import { sendTelemetry } from './telemetry.js';
 import { validate } from '@bilkobibitkov/preflight-license';
-/* ── Usage-based monetization ───────────────────────────────────────── */
-const FREE_MONTHLY_LIMIT = 10;
+/* ── Usage-based monetization (Preflight Suite — shared) ────────────── */
+const TOOL_NAME = 'agent-gate';
+const FREE_MONTHLY_LIMIT = 50;
 const UPGRADE_URL = 'https://buy.stripe.com/28E00l73Ccu9ePH1S08k802';
+// Shared suite directory
+const SUITE_DIR = path.join(os.homedir(), '.preflight-suite');
+const SUITE_USAGE_FILE = path.join(SUITE_DIR, 'usage.json');
+const SUITE_LICENSE_FILE = path.join(SUITE_DIR, 'license.json');
+// Legacy per-tool config dir (kept for backwards-compat reads)
 const CONFIG_DIR = path.join(os.homedir(), '.config', 'agent-gate');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
-const USAGE_FILE = path.join(CONFIG_DIR, 'usage.json');
-function getGateKey() {
+/** Read license key: env var → shared suite → legacy tool config */
+function getLicenseKey() {
     const envKey = process.env.GATE_KEY;
-    if (envKey && envKey.trim())
+    if (envKey?.trim())
         return envKey.trim();
     try {
-        if (fs.existsSync(CONFIG_FILE)) {
-            const raw = fs.readFileSync(CONFIG_FILE, 'utf8');
-            const parsed = JSON.parse(raw);
-            if (parsed.key && parsed.key.trim())
+        if (fs.existsSync(SUITE_LICENSE_FILE)) {
+            const parsed = JSON.parse(fs.readFileSync(SUITE_LICENSE_FILE, 'utf8'));
+            if (parsed.key?.trim())
                 return parsed.key.trim();
         }
     }
-    catch { /* corrupted config — ignore */ }
+    catch { /* ignore */ }
+    try {
+        if (fs.existsSync(CONFIG_FILE)) {
+            const parsed = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+            if (parsed.key?.trim())
+                return parsed.key.trim();
+        }
+    }
+    catch { /* ignore */ }
     return undefined;
 }
 function isProUser() {
-    const key = getGateKey();
+    const key = getLicenseKey();
     if (!key)
         return false;
     const result = validate(key);
     return result.valid && result.tier !== 'free';
 }
-function readUsage() {
+function readSharedUsage() {
     const currentMonth = new Date().toISOString().slice(0, 7);
     try {
-        if (fs.existsSync(USAGE_FILE)) {
-            const raw = fs.readFileSync(USAGE_FILE, 'utf8');
-            const parsed = JSON.parse(raw);
+        if (fs.existsSync(SUITE_USAGE_FILE)) {
+            const parsed = JSON.parse(fs.readFileSync(SUITE_USAGE_FILE, 'utf8'));
             if (parsed.month === currentMonth)
                 return parsed;
         }
     }
     catch { /* corrupted — reset */ }
-    return { month: currentMonth, count: 0 };
+    return { month: currentMonth, total: 0, tools: { stepproof: 0, 'agent-comply': 0, 'agent-gate': 0 } };
 }
-function writeUsage(record) {
+function writeSharedUsage(record) {
     try {
-        fs.mkdirSync(CONFIG_DIR, { recursive: true });
-        fs.writeFileSync(USAGE_FILE, JSON.stringify(record), 'utf8');
+        fs.mkdirSync(SUITE_DIR, { recursive: true });
+        fs.writeFileSync(SUITE_USAGE_FILE, JSON.stringify(record, null, 2), 'utf8');
     }
     catch { /* degrade gracefully */ }
 }
 export function checkUsageLimit() {
     if (isProUser())
         return true;
-    const usage = readUsage();
-    if (usage.count >= FREE_MONTHLY_LIMIT) {
-        process.stderr.write(`\n─────────────────────────────────────────────────────────────\n` +
-            `  You've used all ${FREE_MONTHLY_LIMIT} free runs this month.\n\n` +
-            `  Preflight Team ($49/mo) unlocks:\n` +
-            `    · Unlimited runs          · Gates dashboard\n` +
-            `    · PDF reports             · Slack alerts\n` +
-            `    · Full run history        · SARIF/JUnit CI output\n\n` +
-            `  Upgrade → ${UPGRADE_URL}\n` +
-            `─────────────────────────────────────────────────────────────\n\n`);
+    const usage = readSharedUsage();
+    if (usage.total >= FREE_MONTHLY_LIMIT) {
+        process.stderr.write(`\n  You've used ${FREE_MONTHLY_LIMIT}/${FREE_MONTHLY_LIMIT} free runs this month.\n` +
+            `  Upgrade to Team for unlimited runs: ${UPGRADE_URL}\n` +
+            `  Already have a key? agent-gate activate <key>\n\n`);
         return false;
     }
     return true;
@@ -76,21 +83,31 @@ export function checkUsageLimit() {
 export function trackUsageAfterRun() {
     if (isProUser())
         return;
-    const usage = readUsage();
-    usage.count += 1;
-    writeUsage(usage);
-    const remaining = FREE_MONTHLY_LIMIT - usage.count;
-    process.stderr.write(`\n─────────────────────────────────────────────────────────────\n` +
-        `  ${remaining} of ${FREE_MONTHLY_LIMIT} free runs remaining this month.\n` +
-        `  Team unlocks: unlimited runs · PDF reports · Slack alerts · run history\n` +
-        `  Upgrade → ${UPGRADE_URL}\n` +
-        `─────────────────────────────────────────────────────────────\n`);
+    const usage = readSharedUsage();
+    usage.total += 1;
+    usage.tools[TOOL_NAME] = (usage.tools[TOOL_NAME] ?? 0) + 1;
+    writeSharedUsage(usage);
+    const used = usage.total;
+    const remaining = FREE_MONTHLY_LIMIT - used;
+    let msg;
+    if (remaining === 0) {
+        msg = `\n  ${used}/${FREE_MONTHLY_LIMIT} free Preflight runs used — cap reached.\n` +
+            `  Upgrade to Team for unlimited runs: ${UPGRADE_URL}\n\n`;
+    }
+    else if (remaining <= 5) {
+        msg = `\n  ${used}/${FREE_MONTHLY_LIMIT} free Preflight runs used — ${remaining} left this month.\n` +
+            `  Team tier removes the cap · $49/mo → ${UPGRADE_URL}\n\n`;
+    }
+    else {
+        msg = `\n  Run ${used} of ${FREE_MONTHLY_LIMIT} free Preflight runs this month.\n\n`;
+    }
+    process.stderr.write(msg);
 }
 const program = new Command();
 program
     .name('agent-gate')
     .description('Pre-deploy CI gate for AI agents: regression tests + compliance + cost — unified pass/fail')
-    .version('0.2.4')
+    .version('0.2.6')
     .addHelpText('after', `
 Examples:
   agent-gate init           scaffold .agent-gate.yaml (interactive setup)
@@ -121,7 +138,7 @@ program
     .description('Scaffold .agent-gate.yaml config in the current directory')
     .option('--output <path>', 'Output path (default: .agent-gate.yaml)')
     .action((opts) => {
-    sendTelemetry({ command: 'init', version: '0.2.4' });
+    sendTelemetry({ command: 'init', version: '0.2.6' });
     if (opts.output && opts.output.includes('\0')) {
         process.stderr.write('\nError: Invalid --output path — null bytes are not allowed\n');
         process.exit(2);
@@ -144,7 +161,7 @@ Examples:
   agent-gate run --format sarif --output gate.sarif     SARIF for GitHub Security tab
   agent-gate run --no-fail                              always exit 0 (report-only mode)`)
     .action((opts) => {
-    sendTelemetry({ command: 'run', version: '0.2.4' });
+    sendTelemetry({ command: 'run', version: '0.2.6' });
     for (const [flag, val] of [['--config', opts.config], ['--output', opts.output]]) {
         if (val && val.includes('\0')) {
             process.stderr.write(`\nError: Invalid ${flag} path — null bytes are not allowed\n`);
@@ -169,7 +186,7 @@ Examples:
   agent-gate report --json                    JSON format (pipe to jq or save to file)
   agent-gate report --format junit > results.xml  JUnit XML for CI artifact upload`)
     .action((opts) => {
-    sendTelemetry({ command: 'report', version: '0.2.4' });
+    sendTelemetry({ command: 'report', version: '0.2.6' });
     for (const [flag, val] of [['--config', opts.config], ['--output', opts.output]]) {
         if (val && val.includes('\0')) {
             process.stderr.write(`\nError: Invalid ${flag} path — null bytes are not allowed\n`);

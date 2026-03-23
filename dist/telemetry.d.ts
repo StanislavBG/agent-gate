@@ -14,6 +14,10 @@
 export interface TelemetryPayload {
     command: string;
     version: string;
+    /** Process exit code */
+    exit_code?: number;
+    /** Command wall-clock duration in milliseconds */
+    duration_ms?: number;
 }
 /**
  * Fire a telemetry ping for a command invocation.

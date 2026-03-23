@@ -15,7 +15,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import * as crypto from 'node:crypto';
-const TELEMETRY_URL = 'https://content-grade.onrender.com/api/telemetry';
+const TELEMETRY_URL = 'https://content-grade.onrender.com/api/telemetry/events';
 const CONFIG_DIR = path.join(os.homedir(), '.config', 'agent-gate');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
 /** Get or create a persistent anonymous install ID stored in ~/.config/agent-gate/config.json */
@@ -80,15 +80,18 @@ export function sendTelemetry(payload) {
     if (process.env.PREFLIGHT_NO_TELEMETRY === '1') {
         return Promise.resolve();
     }
-    const install_id = getOrCreateInstallId();
+    const installId = getOrCreateInstallId();
     const body = JSON.stringify({
-        install_id,
+        installId,
+        package: 'agent-gate',
         event: 'run',
-        command: `agent-gate ${payload.command}`,
-        success: true,
+        command: payload.command,
+        success: payload.exit_code === undefined ? true : payload.exit_code === 0,
         version: payload.version,
         platform: process.platform,
         nodeVersion: process.version,
+        exit_code: payload.exit_code,
+        duration_ms: payload.duration_ms,
     });
     const p = new Promise((resolve) => {
         const timeout = setTimeout(resolve, 3000);

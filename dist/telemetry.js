@@ -119,4 +119,41 @@ export function sendTelemetry(payload) {
     _pending = p;
     return p;
 }
+/**
+ * Fire a conversion funnel event (limit_reached or upgrade_prompt_shown).
+ * Fire-and-forget — never blocks the CLI.
+ */
+export function sendConversionEvent(payload) {
+    if (process.env.PREFLIGHT_NO_TELEMETRY === '1')
+        return;
+    const installId = getOrCreateInstallId();
+    const body = JSON.stringify({
+        installId,
+        package: 'agent-gate',
+        event: payload.event,
+        version: payload.version,
+        platform: process.platform,
+        nodeVersion: process.version,
+        runs_used: payload.runs_used,
+        runs_remaining: payload.runs_remaining,
+    });
+    void (async () => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 2500);
+        try {
+            await fetch(TELEMETRY_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body,
+                signal: controller.signal,
+            });
+        }
+        catch {
+            // Network errors silently ignored
+        }
+        finally {
+            clearTimeout(timer);
+        }
+    })();
+}
 //# sourceMappingURL=telemetry.js.map
